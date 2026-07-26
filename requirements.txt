@@ -1,7 +1,9 @@
-groq
-gTTS
 yfinance
-gradio
+groq
 python-dotenv
-numpy
+gTTS
+streamlit
+sounddevice
 scipy
+numpy
+pygame

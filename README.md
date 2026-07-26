@@ -1,6 +1,10 @@
 # 🎙️ Voice AI Assistant
 
-A tool-calling AI assistant that understands typed **and** spoken input, reasons with **Llama 3.3 70B** on Groq, pulls live data (weather, crypto, stocks) when it needs to, and can talk back in a choice of expressive voices — available both as a terminal app and a Gradio web UI.
+A tool-calling AI assistant that understands typed **and** spoken input, reasons with **Llama 3.3 70B** on Groq, pulls live data (weather, crypto, stocks) when it needs to, and can talk back in a choice of expressive voices — available both as a terminal app and a Streamlit web UI.
+
+---
+
+### [![Streamlit App]](https://app.streamlit.app)
 
 ---
 
@@ -36,15 +40,15 @@ A tool-calling AI assistant that understands typed **and** spoken input, reasons
 
 ## Overview
 
-Voice AI Assistant is a lightweight, dependency-conscious assistant built entirely on **free or keyless external APIs** (aside from Groq, which needs one API key). It's designed to demonstrate a complete, real-world voice-agent pipeline — recording, transcription, reasoning with tool calling, and speech synthesis — without any heavyweight infrastructure. Everything runs from a single Python process; no database, no backend server beyond Gradio's own, no cloud deployment required.
+Voice AI Assistant is a lightweight, dependency-conscious assistant built entirely on **free or keyless external APIs** (aside from Groq, which needs one API key). It's designed to demonstrate a complete, real-world voice-agent pipeline — recording, transcription, reasoning with tool calling, and speech synthesis — without any heavyweight infrastructure. Everything runs from a single Python process; no database, no backend server beyond Streamlit's own, no cloud deployment required.
 
 It ships in two forms that share the same reasoning core:
 
 | | Terminal (`main.py`) | Web UI (`app.py`) |
 |---|---|---|
-| Interface | Command line | Gradio browser app |
-| Microphone | Local hardware via `sounddevice` | Browser mic via Gradio's audio component |
-| Playback | `pygame` mixer | HTML5 `<audio>` via Gradio |
+| Interface | Command line | Streamlit browser app |
+| Microphone | Local hardware via `sounddevice` | Browser mic via Streamlit's `st.audio_input` |
+| Playback | `pygame` mixer | Native `st.audio` browser player |
 | Best for | Scripting, quick testing, low-level control | Demoing, day-to-day use, sharing with others |
 
 ## Features
@@ -56,7 +60,7 @@ It ships in two forms that share the same reasoning core:
 - 🗣️ **Six Orpheus voice personas** to choose from, plus regional English accents via gTTS.
 - 🧵 **Conversational memory** — every turn remembers everything said earlier in the same session, so natural follow-ups just work.
 - ✏️ **Editable transcripts** — review, correct, or completely retype what the speech recognizer heard before it's ever sent to the model.
-- 🖥️ **Clean, minimal web interface** — a single scrolling transcript, a pill-shaped input dock, and on-demand audio playback, with no visual clutter.
+- 🖥️ **Clean, minimal web interface** — a pinned input dock, auto-updating transcript review, centered chat, and on-demand audio playback for the latest response.
 - 🔑 **Minimal setup** — only one API key (Groq) is required; every data tool used is free and keyless.
 
 ## Architecture
@@ -110,24 +114,23 @@ It ships in two forms that share the same reasoning core:
 | LLM reasoning | [Groq](https://groq.com) — Llama 3.3 70B (`llama-3.3-70b-versatile`) |
 | Speech-to-text | Groq — Whisper (`whisper-large-v3`) |
 | Text-to-speech | Groq — Orpheus (`canopylabs/orpheus-v1-english`) + [gTTS](https://pypi.org/project/gTTS/) fallback |
-| Web interface | [Gradio](https://www.gradio.app/) |
+| Web interface | [Streamlit](https://streamlit.io/) |
 | Local audio (CLI) | `sounddevice`, `scipy.io.wavfile`, `pygame` |
 | Live data | [Open-Meteo](https://open-meteo.com/), [CoinGecko](https://www.coingecko.com/en/api), [yfinance](https://pypi.org/project/yfinance/) |
-| Secrets management | `python-dotenv` |
+| Secrets management | `python-dotenv` / `st.secrets` |
+
 
 ## Getting Started
 
 ### Prerequisites
-
 - Python 3.10 or later
 - A free Groq API key
 - A working microphone (only needed for speech input)
 
 ### Installation
-
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<notayannn>/<Voice_Assistant>.git
+git clone [https://github.com/](https://github.com/)<notayannn>/<Voice_Assistant>.git
 cd <Voice_Assistant>
 
 # 2. Create and activate a virtual environment (recommended)
@@ -137,6 +140,7 @@ venv\Scripts\activate         # Windows
 
 # 3. Install dependencies
 pip install -r requirements.txt
+
 ```
 
 ### Configuration
@@ -154,15 +158,15 @@ That's the only secret this project needs — every data tool (weather, crypto, 
 ### Web UI (`app.py`)
 
 ```bash
-python app.py
+py app.py
 ```
 
-Gradio will start a local server and print a URL (typically `http://127.0.0.1:7860`) — open it in your browser. Type a message or tap the microphone icon to speak, then press **Send**. Once a reply appears, pick a voice and press **🔊 Hear response** to listen to it.
+Streamlit will start a local web server and open a browser tab (typically http://localhost:8501). Tap the microphone widget to record your prompt or type directly into the input dock. The transcribed text will pop into the text box for you to review or edit before hitting Send. Once a response is generated, choose a voice persona and click Hear Response to listen to the audio playback.
 
 ### Terminal App (`main.py`)
 
 ```bash
-python main.py
+py main.py
 ```
 
 You'll be asked to choose speech or typed input for each turn, review/confirm transcriptions before they're sent, and optionally hear each reply spoken aloud. The session keeps going — and keeps remembering — until you choose to stop.
@@ -206,7 +210,6 @@ Every (question, answer) pair from the current session is kept in memory and res
 
 ## Known Limitations
 
-- Speech recordings in the CLI are a **fixed 5-second window** — there's no automatic silence/voice-activity detection, so longer sentences can get cut off.
 - The LLM's `temperature` is not explicitly configured anywhere, so it runs on Groq's API default rather than a value tuned for this use case.
 - Free-tier limits apply to CoinGecko, Open-Meteo, `yfinance`, and gTTS — expect occasional rate-limiting or slower responses under heavy use.
 - Session memory is not persisted — closing the terminal app or reloading the web page clears the conversation.
@@ -234,4 +237,4 @@ Please keep new tools stateless and keyless where possible, consistent with the 
 
 - [Groq](https://groq.com) for Llama 3.3, Whisper, and Orpheus inference
 - [Open-Meteo](https://open-meteo.com/), [CoinGecko](https://www.coingecko.com/en/api), and [Yahoo Finance](https://finance.yahoo.com/) for free public data APIs
-- [Gradio](https://www.gradio.app/) for the web UI framework
+- Streamlit for the web UI framework
