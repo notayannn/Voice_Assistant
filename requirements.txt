@@ -3,7 +3,4 @@ groq
 python-dotenv
 gTTS
 streamlit
-sounddevice
-scipy
 numpy
-pygame
