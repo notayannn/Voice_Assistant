@@ -1,0 +1,7 @@
+groq
+gTTS
+yfinance
+gradio
+python-dotenv
+numpy
+scipy
